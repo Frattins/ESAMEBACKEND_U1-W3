@@ -1,0 +1,121 @@
+-- Creazione tabella Anagrafiche
+
+CREATE TABLE ANAGRAFICHE (
+    idanagrafica INT PRIMARY KEY IDENTITY,
+    Cognome NVARCHAR(50),
+    Nome NVARCHAR(50),
+    Indirizzo NVARCHAR(100),
+    Città NVARCHAR(50),
+    CAP VARCHAR(10),
+    Cod_Fisc VARCHAR (16) UNIQUE
+);
+
+-- Creazione tabella TIPO_VIOLAZIONE 
+
+CREATE TABLE TIPO_VIOLAZIONE (
+    idviolazione INT PRIMARY KEY IDENTITY,
+    descrizione NVARCHAR(255)
+);
+
+-- Creazione tabella VERBALI
+
+CREATE TABLE VERBALI (
+    idverbale INT PRIMARY KEY IDENTITY,
+    idanagrafica INT,
+    idviolazione INT,
+    DataViolazione DATETIME2(7),
+    IndirizzoViolazione VARCHAR(100),
+    Nominativo_Agente NVARCHAR(50),
+    DataTrascrizioneVerbale DATETIME2(7),
+    Importo DECIMAL(10, 2),
+    DecurtamentoPunti INT,
+    FOREIGN KEY (idanagrafica) REFERENCES ANAGRAFICHE(idanagrafica),
+    FOREIGN KEY (idviolazione) REFERENCES TIPO_VIOLAZIONE(idviolazione)
+);
+
+-----------------------------------
+
+-- ESERCIZIO 1
+SELECT 
+COUNT( idverbale)
+FROM 
+VERBALI
+
+
+-- ESERCIZIO 2
+
+
+SELECT A.idanagrafica, COUNT(V.idverbale) AS ConteggioVerbali
+FROM VERBALI as V
+JOIN ANAGRAFICHE as A ON V.idanagrafica = A.idanagrafica
+GROUP BY A.idanagrafica;
+
+-- ESERCIZIO 3
+
+SELECT T.idviolazione, COUNT(V.idverbale) AS ConteggioVerbali
+FROM VERBALI as V
+JOIN TIPO_VIOLAZIONE as T ON V.idviolazione = T.idviolazione
+GROUP BY T.idviolazione;
+
+
+-- esercizio 4
+
+SELECT A.idanagrafica, SUM(V.DecurtamentoPunti) AS TotalePuntiDecurtati
+FROM VERBALI V
+JOIN ANAGRAFICHE A ON V.idanagrafica = A.idanagrafica
+GROUP BY A.idanagrafica;
+
+
+-- ESERCIZIO 5
+
+SELECT A.Cognome, A.Nome, V.DataViolazione, V.IndirizzoViolazione, V.Importo, V.DecurtamentoPunti
+FROM VERBALI V
+JOIN ANAGRAFICHE A ON V.idanagrafica = A.idanagrafica
+WHERE A.Città = 'Palermo';
+
+
+--ESERCIZIO 6
+
+SELECT A.Cognome, A.Nome, A.Indirizzo, V.DataViolazione, V.Importo, V.DecurtamentoPunti
+FROM VERBALI V
+JOIN ANAGRAFICHE A ON V.idanagrafica = A.idanagrafica
+WHERE V.DataViolazione BETWEEN '2009-02-01' AND '2009-07-31';
+
+--ESERCIZIO 7
+
+SELECT A.idanagrafica, SUM(V.Importo) AS TotaleImporto
+FROM VERBALI V
+JOIN ANAGRAFICHE A ON V.idanagrafica = A.idanagrafica
+GROUP BY A.idanagrafica;
+
+-- ESERCIZIO 8
+
+SELECT *
+FROM ANAGRAFICHE
+WHERE Città = 'Palermo';
+
+--ESERCIZIO 9
+
+SELECT DataViolazione, Importo, DecurtamentoPunti
+FROM VERBALI
+WHERE DataViolazione = '2024-07-01';
+
+--ESERCIZIO 10
+
+SELECT Nominativo_Agente, COUNT(idverbale) AS ConteggioViolazioni
+FROM VERBALI
+GROUP BY Nominativo_Agente;
+
+--ESERICIZIO 11
+
+SELECT A.Cognome, A.Nome, A.Indirizzo, V.DataViolazione, V.Importo, V.DecurtamentoPunti
+FROM VERBALI V
+JOIN ANAGRAFICHE A ON V.idanagrafica = A.idanagrafica
+WHERE V.DecurtamentoPunti > 5;
+
+--ESERCIZIO 12
+
+SELECT A.Cognome, A.Nome, A.Indirizzo, V.DataViolazione, V.Importo, V.DecurtamentoPunti
+FROM VERBALI V
+JOIN ANAGRAFICHE A ON V.idanagrafica = A.idanagrafica
+WHERE V.Importo > 400;
